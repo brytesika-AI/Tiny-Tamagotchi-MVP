@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Tiny Tamagotchi MVP</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <main class="shell">
+      <section class="intro" id="setup">
+        <div>
+          <p class="eyebrow">Spec-driven pet care</p>
+          <h1>Tiny Tamagotchi</h1>
+          <p>Name your little companion, then keep Hunger, Happiness, and Energy healthy.</p>
+        </div>
+        <form class="name-form" id="name-form">
+          <label for="pet-name">Pet name</label>
+          <div class="name-row">
+            <input id="pet-name" name="pet-name" maxlength="18" placeholder="Mochi">
+            <button type="submit">Start</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="game hidden" id="game" aria-labelledby="pet-title">
+        <div class="pet-stage" data-state="Normal" id="pet-stage">
+          <div class="status-strip">
+            <p class="eyebrow">Current state</p>
+            <h2 id="pet-title">Mochi</h2>
+            <p id="state-label">Normal</p>
+          </div>
+          <img class="pet-sprite" id="pet-sprite" src="assets/pet-normal.svg" alt="A happy round virtual pet">
+          <p class="reaction" id="reaction" aria-live="polite">Mochi wiggles hello.</p>
+        </div>
+
+        <div class="dashboard">
+          <section class="vitals" aria-label="Pet vitals">
+            <div class="vital">
+              <div class="vital-top">
+                <span>Hunger</span>
+                <strong id="hunger-value">76</strong>
+              </div>
+              <progress id="hunger-meter" max="100" value="76"></progress>
+            </div>
+            <div class="vital">
+              <div class="vital-top">
+                <span>Happiness</span>
+                <strong id="happiness-value">74</strong>
+              </div>
+              <progress id="happiness-meter" max="100" value="74"></progress>
+            </div>
+            <div class="vital">
+              <div class="vital-top">
+                <span>Energy</span>
+                <strong id="energy-value">78</strong>
+              </div>
+              <progress id="energy-meter" max="100" value="78"></progress>
+            </div>
+          </section>
+
+          <section class="actions" aria-label="Care actions">
+            <button type="button" data-action="feed">
+              <span>Feed</span>
+              <small>snacks and crumbs</small>
+            </button>
+            <button type="button" data-action="play">
+              <span>Play</span>
+              <small>bounces and giggles</small>
+            </button>
+            <button type="button" data-action="rest">
+              <span>Rest</span>
+              <small>blankets and dreams</small>
+            </button>
+          </section>
+
+          <section class="care-notes">
+            <p><strong>Care streak:</strong> <span id="streak">0</span>/3 high-care ticks</p>
+            <p><strong>Next passive tick:</strong> every 10 seconds</p>
+            <button type="button" class="quiet" id="reset">Reset pet</button>
+          </section>
+        </div>
+      </section>
+    </main>
+
+    <script type="module" src="src/app.js"></script>
+  </body>
+</html>
+

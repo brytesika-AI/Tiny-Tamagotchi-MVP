@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 300" role="img" aria-label="Happy round pet">
+  <rect width="320" height="300" fill="none"/>
+  <ellipse cx="160" cy="230" rx="86" ry="18" fill="#17201f" opacity=".18"/>
+  <path d="M78 151c0-58 36-106 82-106s82 48 82 106c0 54-29 96-82 96s-82-42-82-96z" fill="#eafff6" stroke="#17201f" stroke-width="8"/>
+  <circle cx="127" cy="143" r="9" fill="#17201f"/>
+  <circle cx="193" cy="143" r="9" fill="#17201f"/>
+  <path d="M143 171c11 12 24 12 35 0" fill="none" stroke="#17201f" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="104" cy="167" r="13" fill="#ef6b5b" opacity=".55"/>
+  <circle cx="216" cy="167" r="13" fill="#ef6b5b" opacity=".55"/>
+  <path d="M74 178c-23 5-37-5-39-21 22-3 36 5 39 21z" fill="#9ee6b5" stroke="#17201f" stroke-width="7"/>
+  <path d="M246 178c23 5 37-5 39-21-22-3-36 5-39 21z" fill="#9ee6b5" stroke="#17201f" stroke-width="7"/>
+  <path d="M122 54c-16-23-14-37-4-44 17 13 21 27 4 44z" fill="#f7c948" stroke="#17201f" stroke-width="6"/>
+  <path d="M198 54c16-23 14-37 4-44-17 13-21 27-4 44z" fill="#f7c948" stroke="#17201f" stroke-width="6"/>
+</svg>
+

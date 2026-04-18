@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 300" role="img" aria-label="Sick round pet">
+  <rect width="320" height="300" fill="none"/>
+  <ellipse cx="160" cy="232" rx="88" ry="18" fill="#17201f" opacity=".2"/>
+  <path d="M78 154c0-58 36-106 82-106s82 48 82 106c0 54-29 96-82 96s-82-42-82-96z" fill="#bdebd7" stroke="#17201f" stroke-width="8"/>
+  <path d="M113 143c10-10 20-10 30 0" fill="none" stroke="#17201f" stroke-width="7" stroke-linecap="round"/>
+  <path d="M177 143c10-10 20-10 30 0" fill="none" stroke="#17201f" stroke-width="7" stroke-linecap="round"/>
+  <path d="M141 181c12-8 25-8 38 0" fill="none" stroke="#17201f" stroke-width="7" stroke-linecap="round"/>
+  <circle cx="105" cy="170" r="13" fill="#ef6b5b" opacity=".42"/>
+  <circle cx="215" cy="170" r="13" fill="#ef6b5b" opacity=".42"/>
+  <path d="M81 195l-36 24" stroke="#ef6b5b" stroke-width="12" stroke-linecap="round"/>
+  <path d="M239 195l36 24" stroke="#ef6b5b" stroke-width="12" stroke-linecap="round"/>
+  <rect x="36" y="203" width="55" height="24" rx="8" fill="#ffffff" stroke="#17201f" stroke-width="6" transform="rotate(-34 63 215)"/>
+  <rect x="229" y="203" width="55" height="24" rx="8" fill="#ffffff" stroke="#17201f" stroke-width="6" transform="rotate(34 257 215)"/>
+  <path d="M211 55c12-22 29-25 43-11-10 22-27 26-43 11z" fill="#f7c948" stroke="#17201f" stroke-width="6"/>
+  <text x="227" y="45" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" fill="#17201f">?</text>
+</svg>
+

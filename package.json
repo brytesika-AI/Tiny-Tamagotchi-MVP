@@ -1,0 +1,17 @@
+{
+  "name": "tiny-tamagotchi-mvp",
+  "version": "1.0.0",
+  "description": "Spec-driven Tiny Tamagotchi MVP challenge submission",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "spec-driven-development",
+    "virtual-pet",
+    "tamagotchi"
+  ],
+  "author": "Bryte Sika AI",
+  "license": "MIT"
+}
