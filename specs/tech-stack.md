@@ -6,6 +6,8 @@
 - CSS.
 - JavaScript ES modules.
 - Browser `localStorage` for one-device persistence.
+- Cloudflare Pages for static hosting.
+- Cloudflare Pages Functions for standards-based `Request` and `Response` APIs.
 - Node.js built-in test runner for validation.
 
 ## Rationale
@@ -18,6 +20,8 @@ The challenge evaluates spec quality and spec-to-implementation consistency. A d
 - `styles.css` defines the visual presentation.
 - `src/petRules.js` contains deterministic domain rules.
 - `src/app.js` connects domain rules to the browser, timers, rendering, and persistence.
+- `functions/api/health.js` exposes a Cloudflare edge health endpoint.
+- `functions/api/care-brief.js` exposes a Cloudflare edge care recommendation endpoint.
 - `tests/petRules.test.js` validates the rule module.
 - `assets/*.svg` contains pet visual assets.
 

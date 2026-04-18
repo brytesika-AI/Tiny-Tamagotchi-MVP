@@ -23,6 +23,7 @@ const resetButton = document.querySelector("#reset");
 const streak = document.querySelector("#streak");
 const nextAction = document.querySelector("#next-action");
 const careBrief = document.querySelector("#care-brief");
+const edgeStatus = document.querySelector("#edge-status");
 
 const meters = {
   hunger: document.querySelector("#hunger-meter"),
@@ -50,6 +51,8 @@ if (pet) {
   savePet();
   showGame();
 }
+
+checkEdgeApi();
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -128,4 +131,17 @@ function loadPet() {
 
 function savePet() {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(pet));
+}
+
+async function checkEdgeApi() {
+  if (!edgeStatus) {
+    return;
+  }
+
+  try {
+    const response = await fetch("/api/health", { headers: { accept: "application/json" } });
+    edgeStatus.textContent = response.ok ? "Cloudflare edge API online" : "Local static mode";
+  } catch {
+    edgeStatus.textContent = "Local static mode";
+  }
 }

@@ -36,4 +36,15 @@ Run the validation suite:
 npm test
 ```
 
+Deploy to Cloudflare Pages:
+
+```bash
+npm run deploy:cloudflare
+```
+
 The app is intentionally dependency-free: HTML, CSS, browser JavaScript, and Node's built-in test runner.
+
+## Cloudflare APIs
+
+- `GET /api/health` confirms the app is running on Cloudflare Pages Functions.
+- `POST /api/care-brief` returns the next care recommendation from the submitted pet vitals.

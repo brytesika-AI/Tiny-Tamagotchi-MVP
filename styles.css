@@ -377,6 +377,11 @@ progress[data-verdict="critical"]::-moz-progress-bar {
   margin-bottom: 12px;
 }
 
+.edge-status {
+  color: var(--steel-mist);
+  font-size: 0.88rem;
+}
+
 .care-notes strong,
 #next-action {
   color: var(--sovereign-gold);

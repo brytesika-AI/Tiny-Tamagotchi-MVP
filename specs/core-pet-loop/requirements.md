@@ -102,6 +102,13 @@ Care brief rules:
 - If the pet is Sick, the message must explain that every vital must reach at least 45 to recover.
 - If all vitals are at least 80, recommend Monitor and explain that the player should hold the rhythm for 3 passive ticks.
 
+## Cloudflare API Requirements
+
+- `GET /api/health` must return JSON with `ok: true`, the service name, and the Cloudflare Pages Functions runtime label.
+- `POST /api/care-brief` must accept JSON pet vitals and return the same care recommendation rules used by the browser app.
+- Invalid `POST /api/care-brief` requests must return HTTP 400 with a JSON error.
+- The browser must remain playable when the Cloudflare API is unavailable in local static mode.
+
 ## Brand Requirements
 
 - The page background must always be Obsidian `#0D0D0D`.
