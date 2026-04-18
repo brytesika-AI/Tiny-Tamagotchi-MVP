@@ -6,6 +6,8 @@ Tiny Tamagotchi is a single-player browser pet that teaches a short, satisfying 
 
 The project mission is not to build a large game. The primary goal is to produce a complete, scoped, implementation-ready specification that a coding agent can follow without inventing hidden rules.
 
+The visual mission is to make the app feel distinct and personally owned through a dark-only African-inspired brand system: Obsidian foundation, Sovereign Gold emphasis, Resilience Rust actions, Executive White text, and geometric patterning influenced by African textile and mural rhythms.
+
 ## Audience
 
 - Challenge evaluators reviewing whether the specification is clear, testable, and internally consistent.
@@ -47,6 +49,7 @@ The app must not include:
 - The pet can recover from Sick without reset or death.
 - The pet can evolve once when consistently well cared for.
 - The implementation uses the same thresholds, actions, and state lifecycle as the feature requirements.
+- The interface shows a care-intelligence brief that recommends the next useful action from the current vitals.
+- The interface follows the dark-only brand palette without light-mode fallback.
 - Automated tests cover the core pet rules.
 - Manual validation covers the complete browser flow.
-

@@ -164,6 +164,51 @@ export function applyOfflineCatchUp(pet, now = Date.now()) {
   };
 }
 
+export function getVitalVerdict(value) {
+  if (value <= RULES.sickThreshold) {
+    return { level: "critical", label: "FAILED" };
+  }
+  if (value < RULES.recoveryThreshold) {
+    return { level: "warning", label: "PARTIAL" };
+  }
+  return { level: "compliant", label: "PASSED" };
+}
+
+export function getCareBrief(pet) {
+  const vitals = [
+    { key: "hunger", label: "Hunger", value: pet.hunger, action: "Feed" },
+    { key: "happiness", label: "Happiness", value: pet.happiness, action: "Play" },
+    { key: "energy", label: "Energy", value: pet.energy, action: "Rest" }
+  ].sort((a, b) => a.value - b.value);
+
+  const weakest = vitals[0];
+  if (pet.state === STATES.SICK) {
+    return {
+      action: weakest.action,
+      message: `${weakest.label} is the weakest vital. Use ${weakest.action} until every vital is at least ${RULES.recoveryThreshold}.`
+    };
+  }
+
+  if (vitals.every((vital) => vital.value >= RULES.evolutionThreshold)) {
+    return {
+      action: "Monitor",
+      message: `All vitals are evolution-ready. Hold this rhythm for ${RULES.evolutionTicks} passive ticks.`
+    };
+  }
+
+  if (weakest.value < RULES.recoveryThreshold) {
+    return {
+      action: weakest.action,
+      message: `${weakest.label} needs attention before the pet slips into Sick state.`
+    };
+  }
+
+  return {
+    action: weakest.action,
+    message: `${weakest.label} is lowest. A timely ${weakest.action} keeps the care streak alive.`
+  };
+}
+
 export function recalculateState(pet, { passiveTick }) {
   const isSick = [pet.hunger, pet.happiness, pet.energy].some(
     (vital) => vital <= RULES.sickThreshold
@@ -231,4 +276,3 @@ function reactionFor(pet, action) {
 
   return reactions[action];
 }
-

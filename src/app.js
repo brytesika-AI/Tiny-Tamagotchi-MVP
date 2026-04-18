@@ -5,6 +5,8 @@ import {
   applyOfflineCatchUp,
   applyPassiveTick,
   createPet,
+  getCareBrief,
+  getVitalVerdict,
   normalizePet
 } from "./petRules.js";
 
@@ -19,6 +21,8 @@ const petSprite = document.querySelector("#pet-sprite");
 const reaction = document.querySelector("#reaction");
 const resetButton = document.querySelector("#reset");
 const streak = document.querySelector("#streak");
+const nextAction = document.querySelector("#next-action");
+const careBrief = document.querySelector("#care-brief");
 
 const meters = {
   hunger: document.querySelector("#hunger-meter"),
@@ -30,6 +34,12 @@ const values = {
   hunger: document.querySelector("#hunger-value"),
   happiness: document.querySelector("#happiness-value"),
   energy: document.querySelector("#energy-value")
+};
+
+const verdicts = {
+  hunger: document.querySelector("#hunger-verdict"),
+  happiness: document.querySelector("#happiness-verdict"),
+  energy: document.querySelector("#energy-verdict")
 };
 
 let pet = loadPet();
@@ -85,9 +95,17 @@ function render() {
   stage.dataset.state = pet.state;
 
   for (const vital of ["hunger", "happiness", "energy"]) {
+    const verdict = getVitalVerdict(pet[vital]);
     meters[vital].value = pet[vital];
+    meters[vital].dataset.verdict = verdict.level;
     values[vital].textContent = pet[vital];
+    verdicts[vital].textContent = verdict.label;
+    verdicts[vital].dataset.verdict = verdict.level;
   }
+
+  const brief = getCareBrief(pet);
+  nextAction.textContent = brief.action;
+  careBrief.textContent = brief.message;
 
   const sprite = {
     [STATES.NORMAL]: "assets/pet-normal.svg",
@@ -111,4 +129,3 @@ function loadPet() {
 function savePet() {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(pet));
 }
-

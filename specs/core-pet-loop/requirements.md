@@ -86,3 +86,32 @@ On each tick:
 - After three Rest actions, one reaction must mention tiny cloud dreams.
 - Naming the pet `Codex` must produce a special first reaction about reading the spec.
 
+## Care Intelligence
+
+The app must display a care brief with:
+
+- `Next best action`.
+- One sentence explaining why that action is useful.
+
+Care brief rules:
+
+- Sort Hunger, Happiness, and Energy from lowest to highest.
+- Recommend Feed when Hunger is lowest.
+- Recommend Play when Happiness is lowest.
+- Recommend Rest when Energy is lowest.
+- If the pet is Sick, the message must explain that every vital must reach at least 45 to recover.
+- If all vitals are at least 80, recommend Monitor and explain that the player should hold the rhythm for 3 passive ticks.
+
+## Brand Requirements
+
+- The page background must always be Obsidian `#0D0D0D`.
+- There must be no light mode.
+- Body and heading text must use Executive White `#FFFFFF`.
+- Buttons and action borders must use Resilience Rust `#B94A1A`.
+- Accent text and emphasis must use Sovereign Gold `#C17E24`.
+- Inputs must use Slate Navy `#1C2333`.
+- Cards must use Surface Dark `#1A1A1A`.
+- Callouts must use Deep Amber `#2A1A0E`.
+- Labels and captions must use Steel Mist `#8A9BB0`.
+- Governance status colors must be used only for vital verdicts.
+- The UI and pet art must include African-inspired geometric patterning.

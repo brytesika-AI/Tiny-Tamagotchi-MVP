@@ -8,6 +8,8 @@ import {
   applyPassiveTick,
   clampVital,
   createPet,
+  getCareBrief,
+  getVitalVerdict,
   normalizePet
 } from "../src/petRules.js";
 
@@ -156,4 +158,24 @@ test("offline catch-up applies elapsed ticks and caps long absences", () => {
   assert.equal(capped.hunger, 28);
   assert.equal(capped.happiness, 38);
   assert.equal(capped.energy, 18);
+});
+
+test("vital verdicts use governance status thresholds only", () => {
+  assert.deepEqual(getVitalVerdict(20), { level: "critical", label: "FAILED" });
+  assert.deepEqual(getVitalVerdict(44), { level: "warning", label: "PARTIAL" });
+  assert.deepEqual(getVitalVerdict(45), { level: "compliant", label: "PASSED" });
+});
+
+test("care brief recommends the action for the weakest vital", () => {
+  const pet = normalizePet({
+    ...createPet("Pip"),
+    hunger: 70,
+    happiness: 30,
+    energy: 68
+  });
+
+  const brief = getCareBrief(pet);
+
+  assert.equal(brief.action, "Play");
+  assert.match(brief.message, /Happiness/);
 });

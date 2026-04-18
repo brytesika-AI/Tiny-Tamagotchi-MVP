@@ -20,6 +20,8 @@ The automated suite must verify:
 - Evolved pets can become Sick and recover to Evolved.
 - Easter eggs for repeated actions.
 - Offline catch-up applies elapsed ticks and caps at 12.
+- Vital verdict labels from the documented governance thresholds.
+- Care-intelligence recommendation from the weakest vital.
 
 ## Manual Smoke Test
 
@@ -43,8 +45,11 @@ The automated suite must verify:
 8. Restore all vitals to at least 45.
 9. Confirm the pet recovers without permanent death.
 10. Refresh the page and confirm the pet persists.
+11. Confirm the care-intelligence panel recommends Feed, Play, Rest, or Monitor from the current vitals.
+12. Confirm the app stays dark-only with Obsidian as the page background.
+13. Confirm the interface uses gold, rust, white, slate, amber, mist, and surface colors according to `tech-stack.md`.
+14. Confirm governance status colors appear only on vital verdicts.
 
 ## Validation Traceability
 
 Every automated test maps to a rule in `requirements.md`. Manual tests cover browser rendering, persistence, and the user-visible care loop described in `feature-plan.md`.
-

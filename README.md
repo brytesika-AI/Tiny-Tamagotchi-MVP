@@ -1,6 +1,6 @@
 # Tiny Tamagotchi MVP
 
-A spec-driven tiny virtual pet for the DeepLearning.AI 7-Day Challenge.
+A spec-driven tiny virtual pet for the DeepLearning.AI 7-Day Challenge, styled as a dark-only African-inspired care dashboard.
 
 ## What To Review
 
@@ -10,6 +10,15 @@ A spec-driven tiny virtual pet for the DeepLearning.AI 7-Day Challenge.
 - `specs/core-pet-loop/feature-plan.md`
 - `specs/core-pet-loop/requirements.md`
 - `specs/core-pet-loop/validation.md`
+
+## Brand Direction
+
+- Dark-only Obsidian background.
+- Sovereign Gold emphasis.
+- Resilience Rust actions.
+- Executive White text.
+- African-inspired geometric patterning across the pet stage and sprites.
+- Governance status colors only for vital verdicts.
 
 ## Run Locally
 
