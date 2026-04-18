@@ -22,6 +22,8 @@ The automated suite must verify:
 - Offline catch-up applies elapsed ticks and caps at 12.
 - Vital verdict labels from the documented governance thresholds.
 - Care-intelligence recommendation from the weakest vital.
+- Hermes-inspired memory ritual from local action counts.
+- Structured care card includes care, memory, verdicts, and scope constraints.
 - Cloudflare API endpoints return JSON and reuse the same care recommendation rules.
 
 ## Manual Smoke Test
@@ -51,7 +53,8 @@ The automated suite must verify:
 13. Confirm the interface uses gold, rust, white, slate, amber, mist, and surface colors according to `tech-stack.md`.
 14. Confirm governance status colors appear only on vital verdicts.
 15. On Cloudflare Pages, open `/api/health` and confirm it returns `ok: true`.
-16. On Cloudflare Pages, submit pet vitals to `/api/care-brief` and confirm the recommended action matches the weakest vital.
+16. On Cloudflare Pages, submit pet vitals to `/api/care-brief` and confirm the structured card includes `tiny-tamagotchi-care-card-v1`.
+17. Use Feed, Play, or Rest at least three times and confirm Hermes memory changes to a personality ritual without adding new mechanics.
 
 ## Validation Traceability
 

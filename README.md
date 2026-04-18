@@ -20,6 +20,13 @@ A spec-driven tiny virtual pet for the DeepLearning.AI 7-Day Challenge, styled a
 - African-inspired geometric patterning across the pet stage and sprites.
 - Governance status colors only for vital verdicts.
 
+## Hermes-Inspired Twist
+
+The app borrows safe ideas from the Ollama Hermes Agent docs: structured care cards and cross-session memory. It does not add messaging, autonomy, multiple users, inventories, or notifications.
+
+- The browser shows a local Hermes memory ritual based on Feed, Play, and Rest history.
+- `POST /api/care-brief` returns a structured `tiny-tamagotchi-care-card-v1` response.
+
 ## Run Locally
 
 Start the local static server:
@@ -47,4 +54,4 @@ The app is intentionally dependency-free: HTML, CSS, browser JavaScript, and Nod
 ## Cloudflare APIs
 
 - `GET /api/health` confirms the app is running on Cloudflare Pages Functions.
-- `POST /api/care-brief` returns the next care recommendation from the submitted pet vitals.
+- `POST /api/care-brief` returns the structured care card from the submitted pet vitals.

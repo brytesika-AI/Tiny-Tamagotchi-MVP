@@ -102,10 +102,41 @@ Care brief rules:
 - If the pet is Sick, the message must explain that every vital must reach at least 45 to recover.
 - If all vitals are at least 80, recommend Monitor and explain that the player should hold the rhythm for 3 passive ticks.
 
+## Hermes-Inspired Memory
+
+The app may use Hermes-inspired ideas only in ways that preserve the competition scope.
+
+Allowed:
+
+- Structured care output.
+- Local cross-session memory from `actionCounts`.
+- Personality rituals that do not change stats, actions, state rules, or evolution rules.
+
+Not allowed:
+
+- Messaging gateways.
+- Autonomous background agents.
+- Notifications.
+- Multiple users.
+- Multiple pets.
+- Inventories, currencies, or additional actions.
+
+Memory rules:
+
+- If no care action has been taken, the ritual is `First greeting`.
+- If total care actions are fewer than 3, the ritual is `Balanced care apprentice`.
+- If Feed is the strongest action and has at least 3 uses, the ritual is `Calabash snack keeper`.
+- If Play is the strongest action and has at least 3 uses, the ritual is `Courtyard rhythm runner`.
+- If Rest is the strongest action and has at least 3 uses, the ritual is `Baobab dream listener`.
+- Memory summary must show total care moments and the strongest care pattern.
+
 ## Cloudflare API Requirements
 
 - `GET /api/health` must return JSON with `ok: true`, the service name, and the Cloudflare Pages Functions runtime label.
-- `POST /api/care-brief` must accept JSON pet vitals and return the same care recommendation rules used by the browser app.
+- `POST /api/care-brief` must accept JSON pet vitals and return a structured care card.
+- The structured care card schema must be `tiny-tamagotchi-care-card-v1`.
+- The structured care card must include `care`, `memory`, `verdicts`, and `constraints`.
+- The structured care card constraints must state that the app uses one pet, allowed actions are Feed, Play, and Rest, permanent death is not used, and inventory is not used.
 - Invalid `POST /api/care-brief` requests must return HTTP 400 with a JSON error.
 - The browser must remain playable when the Cloudflare API is unavailable in local static mode.
 

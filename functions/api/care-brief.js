@@ -1,4 +1,4 @@
-import { getCareBrief, normalizePet } from "../../src/petRules.js";
+import { getStructuredCareCard, normalizePet } from "../../src/petRules.js";
 
 export async function onRequestPost(context) {
   try {
@@ -6,7 +6,7 @@ export async function onRequestPost(context) {
     const pet = normalizePet(payload);
     return Response.json({
       ok: true,
-      care: getCareBrief(pet)
+      card: getStructuredCareCard(pet)
     });
   } catch {
     return Response.json(
@@ -18,4 +18,3 @@ export async function onRequestPost(context) {
     );
   }
 }
-

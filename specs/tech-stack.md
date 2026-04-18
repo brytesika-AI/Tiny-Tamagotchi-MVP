@@ -21,9 +21,19 @@ The challenge evaluates spec quality and spec-to-implementation consistency. A d
 - `src/petRules.js` contains deterministic domain rules.
 - `src/app.js` connects domain rules to the browser, timers, rendering, and persistence.
 - `functions/api/health.js` exposes a Cloudflare edge health endpoint.
-- `functions/api/care-brief.js` exposes a Cloudflare edge care recommendation endpoint.
+- `functions/api/care-brief.js` exposes a Cloudflare edge structured care card endpoint.
 - `tests/petRules.test.js` validates the rule module.
 - `assets/*.svg` contains pet visual assets.
+
+## Hermes-Inspired Pattern
+
+The app uses Hermes-inspired concepts from the Ollama integration docs as design inspiration only:
+
+- Structured outputs become `tiny-tamagotchi-care-card-v1`.
+- Cross-session memory becomes local action-count memory.
+- Skills become non-mechanical personality rituals.
+
+The app does not use messaging gateways, autonomous agents, multiple users, notifications, or extra actions.
 
 ## Brand System
 

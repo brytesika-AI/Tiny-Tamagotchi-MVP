@@ -15,7 +15,8 @@ The core pet loop makes the pet feel alive through passive decay, simple care ac
 7. If the user restores all vitals above the recovery threshold, the pet returns to Normal.
 8. If the user keeps all vitals high for three passive ticks, the pet evolves once.
 9. The app shows a care-intelligence brief recommending the next best action.
-10. The app saves the pet after every tick and action.
+10. The app shows a Hermes-inspired memory ritual from previous Feed, Play, and Rest actions.
+11. The app saves the pet after every tick and action.
 
 ## State Lifecycle
 
@@ -34,4 +35,6 @@ The core pet loop makes the pet feel alive through passive decay, simple care ac
 - Timed decay must be catch-up aware. If the browser was closed, elapsed time creates the correct number of missed ticks, capped to avoid punishing long absences.
 - Reactions should be deterministic enough to test where practical, with playful messages selected by the action and resulting state.
 - Care guidance must be derived from the same rule module as state transitions.
+- Hermes-inspired memory must be derived from local action counts only.
+- Structured care cards must include constraints proving the app remains inside the competition scope.
 - African-inspired visual patterning must be decorative only and must not introduce extra mechanics.

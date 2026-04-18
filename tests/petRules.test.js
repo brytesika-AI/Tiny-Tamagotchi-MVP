@@ -9,6 +9,8 @@ import {
   clampVital,
   createPet,
   getCareBrief,
+  getMemoryCapsule,
+  getStructuredCareCard,
   getVitalVerdict,
   normalizePet
 } from "../src/petRules.js";
@@ -178,4 +180,30 @@ test("care brief recommends the action for the weakest vital", () => {
 
   assert.equal(brief.action, "Play");
   assert.match(brief.message, /Happiness/);
+});
+
+test("memory capsule summarizes repeated care without changing mechanics", () => {
+  let pet = createPet("Pip");
+
+  pet = applyAction(pet, "feed");
+  pet = applyAction(pet, "feed");
+  pet = applyAction(pet, "feed");
+
+  const memory = getMemoryCapsule(pet);
+
+  assert.equal(memory.ritual, "Calabash snack keeper");
+  assert.equal(memory.counts.feed, 3);
+  assert.equal(memory.totalCare, 3);
+});
+
+test("structured care card exposes rules-safe guidance schema", () => {
+  const card = getStructuredCareCard(createPet("Pip"));
+
+  assert.equal(card.schema, "tiny-tamagotchi-care-card-v1");
+  assert.deepEqual(card.constraints.allowedActions, ["Feed", "Play", "Rest"]);
+  assert.equal(card.constraints.singlePet, true);
+  assert.equal(card.constraints.noDeath, true);
+  assert.ok(card.care);
+  assert.ok(card.memory);
+  assert.ok(card.verdicts.hunger);
 });

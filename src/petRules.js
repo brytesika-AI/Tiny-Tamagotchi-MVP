@@ -209,6 +209,66 @@ export function getCareBrief(pet) {
   };
 }
 
+export function getMemoryCapsule(pet) {
+  const counts = {
+    feed: Number(pet.actionCounts?.feed || 0),
+    play: Number(pet.actionCounts?.play || 0),
+    rest: Number(pet.actionCounts?.rest || 0)
+  };
+  const totalCare = counts.feed + counts.play + counts.rest;
+  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
+  const [topAction, topCount] = sorted[0];
+
+  if (totalCare === 0) {
+    return {
+      ritual: "First greeting",
+      summary: `${pet.name} has no care memory yet. The first action will become part of the ritual.`,
+      counts,
+      totalCare
+    };
+  }
+
+  const rituals = {
+    feed: "Calabash snack keeper",
+    play: "Courtyard rhythm runner",
+    rest: "Baobab dream listener"
+  };
+
+  const actionLabel = {
+    feed: "feeding",
+    play: "play",
+    rest: "rest"
+  };
+
+  const ritual = topCount >= 3 ? rituals[topAction] : "Balanced care apprentice";
+
+  return {
+    ritual,
+    summary: `${pet.name} remembers ${totalCare} care moments. ${actionLabel[topAction]} is the strongest pattern.`,
+    counts,
+    totalCare
+  };
+}
+
+export function getStructuredCareCard(pet) {
+  return {
+    schema: "tiny-tamagotchi-care-card-v1",
+    constraints: {
+      singlePet: true,
+      allowedActions: ["Feed", "Play", "Rest"],
+      noDeath: true,
+      noInventory: true
+    },
+    care: getCareBrief(pet),
+    memory: getMemoryCapsule(pet),
+    verdicts: {
+      hunger: getVitalVerdict(pet.hunger),
+      happiness: getVitalVerdict(pet.happiness),
+      energy: getVitalVerdict(pet.energy)
+    }
+  };
+}
+
 export function recalculateState(pet, { passiveTick }) {
   const isSick = [pet.hunger, pet.happiness, pet.energy].some(
     (vital) => vital <= RULES.sickThreshold

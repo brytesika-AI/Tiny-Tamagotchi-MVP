@@ -6,6 +6,7 @@ import {
   applyPassiveTick,
   createPet,
   getCareBrief,
+  getMemoryCapsule,
   getVitalVerdict,
   normalizePet
 } from "./petRules.js";
@@ -24,6 +25,8 @@ const streak = document.querySelector("#streak");
 const nextAction = document.querySelector("#next-action");
 const careBrief = document.querySelector("#care-brief");
 const edgeStatus = document.querySelector("#edge-status");
+const memoryRitual = document.querySelector("#memory-ritual");
+const memorySummary = document.querySelector("#memory-summary");
 
 const meters = {
   hunger: document.querySelector("#hunger-meter"),
@@ -109,6 +112,10 @@ function render() {
   const brief = getCareBrief(pet);
   nextAction.textContent = brief.action;
   careBrief.textContent = brief.message;
+
+  const memory = getMemoryCapsule(pet);
+  memoryRitual.textContent = memory.ritual;
+  memorySummary.textContent = memory.summary;
 
   const sprite = {
     [STATES.NORMAL]: "assets/pet-normal.svg",
