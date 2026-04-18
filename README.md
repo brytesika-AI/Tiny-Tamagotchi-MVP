@@ -1,61 +1,116 @@
 # Tiny Tamagotchi MVP
 
-A spec-driven tiny virtual pet for the DeepLearning.AI 7-Day Challenge, styled as a dark-only African-inspired care dashboard.
+Spec-driven virtual pet submission for the DeepLearning.AI 7-Day Learner Challenge.
 
-## What To Review
+## Project Summary
 
-- `specs/mission.md`
-- `specs/roadmap.md`
-- `specs/tech-stack.md`
-- `specs/core-pet-loop/feature-plan.md`
-- `specs/core-pet-loop/requirements.md`
-- `specs/core-pet-loop/validation.md`
+Tiny Tamagotchi MVP is a small browser app where one user cares for one named pet. The pet has Hunger, Happiness, and Energy stats, three care actions, three visible states, one recovery path, one evolution path, and deterministic personality messages.
 
-## Brand Direction
+The primary artifact is the specification. The app exists to prove that the spec is implementation-ready and internally consistent.
 
-- Dark-only Obsidian background.
-- Sovereign Gold emphasis.
-- Resilience Rust actions.
-- Executive White text.
-- African-inspired geometric patterning across the pet stage and sprites.
-- Governance status colors only for vital verdicts.
+## Why This Is Spec-Driven
 
-## Hermes-Inspired Twist
+The repo is organized around constitution docs and feature specs before implementation details:
 
-The app borrows safe ideas from the Ollama Hermes Agent docs: structured care cards and cross-session memory. It does not add messaging, autonomy, multiple users, inventories, or notifications.
+- Constitution docs define mission, roadmap, stack, constraints, and tradeoffs.
+- Feature docs define intent, user flows, thresholds, algorithms, edge cases, validation, and acceptance criteria.
+- The implementation keeps all game rules in `src/petRules.js`.
+- Automated tests import the rule module directly and verify the documented mechanics.
 
-- The browser shows a local Hermes memory ritual based on Feed, Play, and Rest history.
-- `POST /api/care-brief` returns a structured `tiny-tamagotchi-care-card-v1` response.
+## Repo Structure
 
-## Course-Inspired Spec Workflow
-
-The specs follow the course repo pattern: constitution first, then a feature package with plan, requirements, validation, Definition of Done, and traceability.
+```text
+specs/
+  mission.md
+  roadmap.md
+  tech-stack.md
+core-loop/
+  feature-plan.md
+  requirements.md
+  validation.md
+pet-state-system/
+  feature-plan.md
+  requirements.md
+  validation.md
+evolution-system/
+  feature-plan.md
+  requirements.md
+  validation.md
+personality-easter-eggs/
+  feature-plan.md
+  requirements.md
+  validation.md
+tests/
+  README.md
+  petRules.test.js
+src/
+  app.js
+  petRules.js
+assets/
+  pet-normal.svg
+  pet-sick.svg
+  pet-evolved.svg
+index.html
+styles.css
+server.js
+package.json
+```
 
 ## Run Locally
-
-Start the local static server:
 
 ```bash
 npm start
 ```
 
-Then open `http://localhost:4173`.
+Open:
 
-Run the validation suite:
+```text
+http://localhost:4173
+```
+
+## Run Tests
 
 ```bash
 npm test
 ```
 
-Deploy to Cloudflare Pages:
+The test suite validates initial state, action effects, tick decay, Sick transition, recovery, evolution, persistence normalization, elapsed tick catch-up, and personality messages.
 
-```bash
-npm run deploy:cloudflare
-```
+## Spec to Implementation Mapping
 
-The app is intentionally dependency-free: HTML, CSS, browser JavaScript, and Node's built-in test runner.
+| Spec Area | Implementation | Tests |
+| --- | --- | --- |
+| Core loop | `src/petRules.js`, `src/app.js` | `tests/petRules.test.js` |
+| Pet state system | `src/petRules.js` | Sick and recovery tests |
+| Evolution system | `src/petRules.js` | Evolution tests |
+| Personality/easter eggs | `src/petRules.js`, `src/app.js` | Message tests |
+| Persistence | `src/app.js`, `src/petRules.js` | Normalization and elapsed tick tests |
 
-## Cloudflare APIs
+## Challenge Scope Boundaries
 
-- `GET /api/health` confirms the app is running on Cloudflare Pages Functions.
-- `POST /api/care-brief` returns the structured care card from the submitted pet vitals.
+Included:
+
+- One user.
+- One pet.
+- Pet naming.
+- Hunger, Happiness, Energy.
+- Feed, Play, Rest.
+- Normal, Sick, Evolved.
+- One recovery path.
+- One one-time evolution.
+- Small deterministic personality messages.
+- Browser localStorage persistence.
+
+Not included:
+
+- Authentication.
+- Multiple users.
+- Multiple pets.
+- Inventory.
+- Currency.
+- Social features.
+- Notifications.
+- Permanent death.
+- Mini-games.
+- Admin features.
+- Complex evolutions.

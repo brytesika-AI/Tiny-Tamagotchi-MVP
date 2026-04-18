@@ -1,87 +1,62 @@
 # Tech Stack
 
-## Runtime
+## Chosen Stack
 
-- Static HTML.
+- Plain HTML.
 - CSS.
 - JavaScript ES modules.
-- Browser `localStorage` for one-device persistence.
-- Cloudflare Pages for static hosting.
-- Cloudflare Pages Functions for standards-based `Request` and `Response` APIs.
-- Node.js built-in test runner for validation.
+- Node.js built-in test runner.
+- Browser `localStorage`.
+- Tiny local static server for convenient local review.
 
-## Rationale
+## Why This Stack
 
-The challenge evaluates spec quality and spec-to-implementation consistency. A dependency-free static app keeps the code easy to inspect, run, and validate without setup risk.
+The challenge rewards clear specifications and implementation consistency, not framework complexity. A dependency-free single-page app keeps the system easy for judges to inspect and easy for tests to validate.
 
-## Architecture
+## Files and Responsibilities
 
-- `index.html` defines the app shell and accessible controls.
-- `styles.css` defines the visual presentation.
-- `src/petRules.js` contains deterministic domain rules.
-- `src/app.js` connects domain rules to the browser, timers, rendering, and persistence.
-- `functions/api/health.js` exposes a Cloudflare edge health endpoint.
-- `functions/api/care-brief.js` exposes a Cloudflare edge structured care card endpoint.
-- `tests/petRules.test.js` validates the rule module.
-- `assets/*.svg` contains pet visual assets.
+- `index.html`: app shell, accessible controls, visible counters, and vitals.
+- `styles.css`: visual presentation.
+- `src/app.js`: browser event handling, rendering, timer, and localStorage integration.
+- `src/petRules.js`: deterministic game logic.
+- `tests/petRules.test.js`: automated tests for core rules.
+- `server.js`: local static server.
+- `assets/*.svg`: pet visuals for Normal, Sick, and Evolved.
 
-## Hermes-Inspired Pattern
+## Persistence Approach
 
-The app uses Hermes-inspired concepts from the Ollama integration docs as design inspiration only:
+The app stores one pet record in `localStorage` under `tiny-tamagotchi-state-v2`.
 
-- Structured outputs become `tiny-tamagotchi-care-card-v1`.
-- Cross-session memory becomes local action-count memory.
-- Skills become non-mechanical personality rituals.
-
-The app does not use messaging gateways, autonomous agents, multiple users, notifications, or extra actions.
-
-## Brand System
-
-The app is dark-only. Obsidian `#0D0D0D` is always the page background.
-
-Primary palette:
-
-- Obsidian `#0D0D0D`: page background.
-- Sovereign Gold `#C17E24`: accent text and emphasis.
-- Resilience Rust `#B94A1A`: buttons and action borders.
-- Executive White `#FFFFFF`: body and heading text.
-
-Supporting palette:
-
-- Slate Navy `#1C2333`: input fields and progress tracks.
-- Deep Amber `#2A1A0E`: callout backgrounds.
-- Steel Mist `#8A9BB0`: labels and captions.
-- Surface Dark `#1A1A1A`: lifted cards.
-
-Governance status colors:
-
-- Compliant Green `#3DD68C`: passed vital verdicts.
-- Warning Amber `#F5A623`: partial vital verdicts.
-- Critical Red `#E84040`: failed vital verdicts.
-- Intel Blue `#4A9EE8`: informational verdicts if needed.
-
-Governance status colors must only communicate vital verdicts. They must not be used as decorative background colors or general state decoration.
-
-## Persistence
-
-The app stores one pet record in `localStorage` under the key `tiny-tamagotchi-state-v1`.
-
-Stored fields:
+Persisted fields:
 
 - `name`
 - `hunger`
 - `happiness`
 - `energy`
 - `state`
-- `healthyTicks`
+- `sickLowTicks`
+- `recoveryTicks`
+- `evolutionHighTicks`
 - `evolved`
+- `totalActions`
 - `lastUpdated`
-- `reaction`
 - `actionCounts`
+- `message`
 
-## Accessibility
+On reload, the app restores the saved record, normalizes invalid values, and applies elapsed ticks using the same 10-second tick interval. Catch-up is capped at 12 ticks to keep reload behavior conservative and deterministic.
 
-- Buttons use native button elements.
-- Vitals use semantic progress bars.
-- Important changes are announced in an `aria-live` region.
-- The visual state is also represented in text, not color alone.
+## Testing Approach
+
+Automated tests use Node's built-in test runner and import `src/petRules.js` directly. Manual validation checklists live in the feature validation documents.
+
+Validation has two levels:
+
+- Automated unit tests for deterministic logic.
+- Manual user-flow tests for browser behavior, persistence, and visual clarity.
+
+## Tradeoffs
+
+- No framework keeps setup small, but UI structure is manual.
+- localStorage is enough for one browser user, but it is not cloud sync.
+- Deterministic messages are less surprising than AI-generated text, but easier to validate and safer for the rubric.
+- Offline catch-up is capped, which favors predictable demos over strict real-time simulation.

@@ -1,58 +1,51 @@
 # Mission
 
-## Product Mission
+## Mission
 
-Tiny Tamagotchi is a single-player browser pet that teaches a short, satisfying care loop: notice changing vitals, choose one of three care actions, and watch the pet react through visible states.
+Tiny Tamagotchi MVP is a tiny browser-based virtual pet built to demonstrate spec-driven development. The goal is not to build the largest game; the goal is to make the specification precise enough that a coding agent can implement the app without inventing hidden rules.
 
-The project mission is not to build a large game. The primary goal is to produce a complete, scoped, implementation-ready specification that a coding agent can follow without inventing hidden rules.
-
-The visual mission is to make the app feel distinct and personally owned through a dark-only African-inspired brand system: Obsidian foundation, Sovereign Gold emphasis, Resilience Rust actions, Executive White text, and geometric patterning influenced by African textile and mural rhythms.
-
-The intelligence mission is to borrow competition-safe ideas from Hermes-style agents: structured outputs and cross-session memory. The app must present these as local care guidance and personality memory, not as autonomous play, messaging, notifications, or extra systems.
+The app lets one user care for one named pet by watching three stats, choosing three actions, and responding to clear state changes.
 
 ## Audience
 
-- Challenge evaluators reviewing whether the specification is clear, testable, and internally consistent.
-- Learners practicing spec-driven development with coding agents.
-- A casual player who wants a pet that responds quickly within a short demo.
+- DeepLearning.AI challenge judges who will primarily review the specification quality.
+- Learners studying how specs guide coding agents.
+- A demo viewer who should understand the care loop in 1 to 2 minutes.
 
-## Scope Constraints
+## Constraints
 
-The app must include:
+- One browser user.
+- One pet.
+- One pet name.
+- Three stats only: Hunger, Happiness, Energy.
+- Three actions only: Feed, Play, Rest.
+- Three visible states only: Normal, Sick, Evolved.
+- One recovery path from Sick to Normal.
+- One evolution path.
+- Local browser persistence only.
+- Deterministic rules that are testable without the UI.
 
-- One named pet.
-- One local user in one browser.
-- Three vitals from 0 to 100: Hunger, Happiness, and Energy.
-- Three actions: Feed, Play, and Rest.
-- Three states: Normal, Sick, and Evolved.
-- One recovery path from Sick back to Normal.
-- One evolution path from Normal to Evolved.
-- Small personality reactions or Easter eggs.
+## Non-Goals
 
-The app must not include:
-
-- Authentication.
-- Multiple users.
-- Multiple pets.
-- Inventories, currencies, stores, or unlock economies.
-- Mini-games.
-- Social features.
-- Notifications outside the page.
-- Admin features.
-- Multiple evolution branches.
-- Permanent death.
+- No authentication.
+- No multiple users.
+- No multiple pets.
+- No inventory.
+- No currency.
+- No social features.
+- No notifications.
+- No permanent death.
+- No mini-games.
+- No admin features.
+- No complex evolution tree.
+- No required backend service.
 
 ## Success Criteria
 
-- A user can name the pet and immediately begin caring for it.
-- Vitals visibly decrease over time without user action.
-- Feed, Play, and Rest change vitals according to documented rules.
-- The pet becomes Sick when neglected according to documented thresholds.
-- The pet can recover from Sick without reset or death.
-- The pet can evolve once when consistently well cared for.
-- The implementation uses the same thresholds, actions, and state lifecycle as the feature requirements.
-- The interface shows a care-intelligence brief that recommends the next useful action from the current vitals.
-- The interface shows a Hermes-inspired memory ritual based only on allowed care actions.
-- The interface follows the dark-only brand palette without light-mode fallback.
-- Automated tests cover the core pet rules.
-- Manual validation covers the complete browser flow.
+- The documentation structure matches the required challenge structure.
+- Every threshold, decay rule, action effect, state transition, persistence rule, and edge case is specified.
+- The implementation follows the specification exactly.
+- Automated tests validate core game logic.
+- Manual validation checklists cover user-facing flows.
+- The app is small, polished, and easy to review.
+- The README lets judges quickly understand scope, run the app, run tests, and map specs to implementation.

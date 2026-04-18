@@ -3,207 +3,257 @@ import assert from "node:assert/strict";
 import {
   RULES,
   STATES,
+  ACTIONS,
   applyAction,
-  applyOfflineCatchUp,
-  applyPassiveTick,
-  clampVital,
+  applyElapsedTicks,
+  applyTick,
+  averageStats,
+  clampStat,
   createPet,
-  getCareBrief,
-  getMemoryCapsule,
-  getStructuredCareCard,
-  getVitalVerdict,
+  getVitalStatus,
   normalizePet
 } from "../src/petRules.js";
 
-test("creates a default pet with the required starting values", () => {
+test("creates one default pet with specified starting values", () => {
   const pet = createPet("   ", 1000);
 
   assert.equal(pet.name, "Mochi");
-  assert.equal(pet.hunger, 76);
-  assert.equal(pet.happiness, 74);
-  assert.equal(pet.energy, 78);
+  assert.equal(pet.hunger, 80);
+  assert.equal(pet.happiness, 80);
+  assert.equal(pet.energy, 80);
   assert.equal(pet.state, STATES.NORMAL);
-  assert.equal(pet.healthyTicks, 0);
+  assert.equal(pet.totalActions, 0);
   assert.equal(pet.evolved, false);
 });
 
-test("clamps vitals to the documented 0 to 100 range", () => {
-  assert.equal(clampVital(-20), 0);
-  assert.equal(clampVital(44.6), 45);
-  assert.equal(clampVital(140), 100);
+test("clamps stats to the 0 to 100 range", () => {
+  assert.equal(clampStat(-1), 0);
+  assert.equal(clampStat(50.4), 50);
+  assert.equal(clampStat(120), 100);
 });
 
-test("applies Feed, Play, and Rest deltas", () => {
+test("applies Feed, Play, and Rest exactly as specified", () => {
   const start = createPet("Pip", 1000);
-  const fed = applyAction(start, "feed", 2000);
-  const played = applyAction(start, "play", 2000);
-  const rested = applyAction(start, "rest", 2000);
+  const fed = applyAction(start, ACTIONS.FEED, 2000);
+  const played = applyAction(start, ACTIONS.PLAY, 2000);
+  const rested = applyAction(start, ACTIONS.REST, 2000);
 
-  assert.equal(fed.hunger, 94);
-  assert.equal(fed.happiness, 78);
-  assert.equal(fed.energy, 74);
-  assert.equal(played.hunger, 70);
-  assert.equal(played.happiness, 90);
-  assert.equal(played.energy, 68);
-  assert.equal(rested.hunger, 73);
-  assert.equal(rested.happiness, 70);
+  assert.equal(fed.hunger, 100);
+  assert.equal(fed.happiness, 82);
+  assert.equal(fed.energy, 80);
+  assert.equal(played.hunger, 75);
+  assert.equal(played.happiness, 100);
+  assert.equal(played.energy, 70);
+  assert.equal(rested.hunger, 80);
+  assert.equal(rested.happiness, 78);
   assert.equal(rested.energy, 100);
+  assert.equal(fed.totalActions, 1);
 });
 
-test("passive tick decays all vitals by the documented amounts", () => {
-  const pet = applyPassiveTick(createPet("Pip", 1000), 11_000);
+test("tick decays stats by 8 hunger, 6 happiness, and 5 energy", () => {
+  const pet = applyTick(createPet("Pip", 1000), 11_000);
 
   assert.equal(pet.hunger, 72);
-  assert.equal(pet.happiness, 71);
-  assert.equal(pet.energy, 73);
+  assert.equal(pet.happiness, 74);
+  assert.equal(pet.energy, 75);
 });
 
-test("pet becomes Sick when any vital is at or below the sick threshold", () => {
-  const sick = normalizePet({
-    ...createPet("Pip"),
-    hunger: RULES.sickThreshold,
-    happiness: 90,
-    energy: 90
-  });
-
-  assert.equal(sick.state, STATES.SICK);
-});
-
-test("Sick pet recovers to Normal when all vitals reach the recovery threshold", () => {
+test("Sick triggers only after any stat is below 20 for three consecutive ticks", () => {
   let pet = normalizePet({
     ...createPet("Pip"),
-    hunger: 20,
-    happiness: 90,
-    energy: 90
+    hunger: 25,
+    happiness: 80,
+    energy: 80
   });
 
-  pet = normalizePet({
-    ...pet,
-    hunger: RULES.recoveryThreshold,
-    happiness: RULES.recoveryThreshold,
-    energy: RULES.recoveryThreshold
+  pet = applyTick(pet, 10_000);
+  assert.equal(pet.hunger, 17);
+  assert.equal(pet.sickLowTicks, 1);
+  assert.equal(pet.state, STATES.NORMAL);
+
+  pet = applyTick(pet, 20_000);
+  assert.equal(pet.sickLowTicks, 2);
+  assert.equal(pet.state, STATES.NORMAL);
+
+  pet = applyTick(pet, 30_000);
+  assert.equal(pet.sickLowTicks, 3);
+  assert.equal(pet.state, STATES.SICK);
+});
+
+test("Sick recovery requires all stats above 40 for two consecutive ticks", () => {
+  let pet = normalizePet({
+    ...createPet("Pip"),
+    state: STATES.SICK,
+    hunger: 60,
+    happiness: 60,
+    energy: 60,
+    sickLowTicks: 3
   });
 
+  pet = applyTick(pet, 10_000);
+  assert.equal(pet.recoveryTicks, 1);
+  assert.equal(pet.state, STATES.SICK);
+
+  pet = applyTick(pet, 20_000);
+  assert.equal(pet.recoveryTicks, 0);
   assert.equal(pet.state, STATES.NORMAL);
 });
 
-test("pet evolves after three high-care passive ticks", () => {
+test("recovery counter resets if any stat is not above 40", () => {
+  let pet = normalizePet({
+    ...createPet("Pip"),
+    state: STATES.SICK,
+    hunger: 55,
+    happiness: 47,
+    energy: 55,
+    recoveryTicks: 1
+  });
+
+  pet = applyTick(pet, 10_000);
+
+  assert.equal(pet.happiness, 41);
+  assert.equal(pet.recoveryTicks, 0);
+  assert.equal(pet.state, STATES.NORMAL);
+
+  pet = normalizePet({
+    ...pet,
+    state: STATES.SICK,
+    hunger: 48,
+    happiness: 46,
+    energy: 44,
+    recoveryTicks: 1
+  });
+  pet = applyTick(pet, 20_000);
+
+  assert.equal(pet.energy, 39);
+  assert.equal(pet.recoveryTicks, 0);
+  assert.equal(pet.state, STATES.SICK);
+});
+
+test("evolution requires average at least 70 for five ticks and at least eight actions", () => {
   let pet = normalizePet({
     ...createPet("Pip"),
     hunger: 100,
     happiness: 100,
-    energy: 100
+    energy: 100,
+    totalActions: 7
   });
 
-  pet = applyPassiveTick(pet, 10_000);
-  pet = applyPassiveTick(pet, 20_000);
-  pet = applyPassiveTick(pet, 30_000);
+  for (let index = 0; index < 5; index += 1) {
+    pet = applyTick(pet, index * 10_000);
+  }
+  assert.equal(pet.evolved, false);
+  assert.equal(pet.state, STATES.NORMAL);
+
+  pet = normalizePet({
+    ...pet,
+    hunger: 100,
+    happiness: 100,
+    energy: 100,
+    totalActions: 8,
+    evolutionHighTicks: 0
+  });
+
+  for (let index = 0; index < 5; index += 1) {
+    pet = normalizePet({
+      ...pet,
+      hunger: 100,
+      happiness: 100,
+      energy: 100
+    });
+    pet = applyTick(pet, 60_000 + index * 10_000);
+  }
 
   assert.equal(pet.evolved, true);
   assert.equal(pet.state, STATES.EVOLVED);
 });
 
-test("evolved pet can become Sick and recover to Evolved", () => {
+test("evolution happens only once", () => {
   let pet = normalizePet({
     ...createPet("Pip"),
-    evolved: true,
     state: STATES.EVOLVED,
-    hunger: 19,
-    happiness: 90,
-    energy: 90
+    evolved: true,
+    hunger: 100,
+    happiness: 100,
+    energy: 100,
+    totalActions: 20,
+    evolutionHighTicks: 5
   });
 
-  assert.equal(pet.state, STATES.SICK);
+  pet = applyTick(pet, 10_000);
+
+  assert.equal(pet.evolved, true);
+  assert.equal(pet.state, STATES.EVOLVED);
+  assert.equal(pet.evolutionHighTicks, 5);
+});
+
+test("elapsed tick catch-up is deterministic and capped", () => {
+  const pet = createPet("Pip", 0);
+  const twoTicks = applyElapsedTicks(pet, RULES.tickMs * 2);
+  const capped = applyElapsedTicks(pet, RULES.tickMs * 30);
+
+  assert.equal(twoTicks.hunger, 64);
+  assert.equal(twoTicks.happiness, 68);
+  assert.equal(twoTicks.energy, 70);
+  assert.equal(capped.hunger, 0);
+  assert.equal(capped.happiness, 8);
+  assert.equal(capped.energy, 20);
+});
+
+test("personality messages cover high happiness, low energy, repeated feed, and first evolution", () => {
+  let pet = createPet("Pip");
+
+  pet = applyAction(pet, ACTIONS.PLAY);
+  assert.match(pet.message, /victory dance/);
+
+  pet = normalizePet({ ...createPet("Pip"), happiness: 50, energy: 15 });
+  pet = applyAction(pet, ACTIONS.FEED);
+  assert.match(pet.message, /quiet rest/);
+
+  pet = createPet("Pip");
+  pet = applyAction(pet, ACTIONS.FEED);
+  pet = applyAction(pet, ACTIONS.FEED);
+  pet = applyAction(pet, ACTIONS.FEED);
+  assert.match(pet.message, /secret snack stash/);
 
   pet = normalizePet({
     ...pet,
-    hunger: 45,
-    happiness: 45,
-    energy: 45
+    hunger: 100,
+    happiness: 100,
+    energy: 100,
+    totalActions: 8,
+    evolutionHighTicks: 4
   });
-
-  assert.equal(pet.state, STATES.EVOLVED);
+  pet = applyTick(pet);
+  assert.match(pet.message, /evolves for the first time/);
 });
 
-test("repeated actions trigger documented Easter eggs", () => {
-  let pet = createPet("Pip");
-
-  pet = applyAction(pet, "feed");
-  pet = applyAction(pet, "feed");
-  pet = applyAction(pet, "feed");
-  assert.match(pet.reaction, /secret crumb stash/);
-
-  pet = applyAction(pet, "play");
-  pet = applyAction(pet, "play");
-  pet = applyAction(pet, "play");
-  assert.match(pet.reaction, /cardboard rocket/);
-
-  pet = applyAction(pet, "rest");
-  pet = applyAction(pet, "rest");
-  pet = applyAction(pet, "rest");
-  assert.match(pet.reaction, /tiny clouds/);
-});
-
-test("Codex name produces the special first reaction", () => {
-  const pet = createPet("Codex");
-  assert.match(pet.reaction, /reads the spec/);
-});
-
-test("offline catch-up applies elapsed ticks and caps long absences", () => {
-  const pet = createPet("Pip", 0);
-  const twoTicks = applyOfflineCatchUp(pet, RULES.tickMs * 2);
-  const capped = applyOfflineCatchUp(pet, RULES.tickMs * 30);
-
-  assert.equal(twoTicks.hunger, 68);
-  assert.equal(twoTicks.happiness, 68);
-  assert.equal(twoTicks.energy, 68);
-  assert.equal(capped.hunger, 28);
-  assert.equal(capped.happiness, 38);
-  assert.equal(capped.energy, 18);
-});
-
-test("vital verdicts use governance status thresholds only", () => {
-  assert.deepEqual(getVitalVerdict(20), { level: "critical", label: "FAILED" });
-  assert.deepEqual(getVitalVerdict(44), { level: "warning", label: "PARTIAL" });
-  assert.deepEqual(getVitalVerdict(45), { level: "compliant", label: "PASSED" });
-});
-
-test("care brief recommends the action for the weakest vital", () => {
+test("persistence normalization restores saved state safely", () => {
   const pet = normalizePet({
-    ...createPet("Pip"),
-    hunger: 70,
-    happiness: 30,
-    energy: 68
+    name: "  Zuri  ",
+    hunger: 120,
+    happiness: -10,
+    energy: 55,
+    state: "Unexpected",
+    totalActions: 2,
+    evolved: true,
+    actionCounts: { feed: 1, play: 1, rest: 0 }
   });
 
-  const brief = getCareBrief(pet);
-
-  assert.equal(brief.action, "Play");
-  assert.match(brief.message, /Happiness/);
+  assert.equal(pet.name, "Zuri");
+  assert.equal(pet.hunger, 100);
+  assert.equal(pet.happiness, 0);
+  assert.equal(pet.energy, 55);
+  assert.equal(pet.state, STATES.NORMAL);
+  assert.equal(pet.evolved, true);
+  assert.equal(pet.totalActions, 2);
 });
 
-test("memory capsule summarizes repeated care without changing mechanics", () => {
-  let pet = createPet("Pip");
+test("average and visible vital statuses are deterministic", () => {
+  const pet = normalizePet({ ...createPet("Pip"), hunger: 70, happiness: 80, energy: 90 });
 
-  pet = applyAction(pet, "feed");
-  pet = applyAction(pet, "feed");
-  pet = applyAction(pet, "feed");
-
-  const memory = getMemoryCapsule(pet);
-
-  assert.equal(memory.ritual, "Calabash snack keeper");
-  assert.equal(memory.counts.feed, 3);
-  assert.equal(memory.totalCare, 3);
-});
-
-test("structured care card exposes rules-safe guidance schema", () => {
-  const card = getStructuredCareCard(createPet("Pip"));
-
-  assert.equal(card.schema, "tiny-tamagotchi-care-card-v1");
-  assert.deepEqual(card.constraints.allowedActions, ["Feed", "Play", "Rest"]);
-  assert.equal(card.constraints.singlePet, true);
-  assert.equal(card.constraints.noDeath, true);
-  assert.ok(card.care);
-  assert.ok(card.memory);
-  assert.ok(card.verdicts.hunger);
+  assert.equal(averageStats(pet), 80);
+  assert.deepEqual(getVitalStatus(19), { level: "critical", label: "LOW" });
+  assert.deepEqual(getVitalStatus(40), { level: "warning", label: "WATCH" });
+  assert.deepEqual(getVitalStatus(41), { level: "healthy", label: "OK" });
 });

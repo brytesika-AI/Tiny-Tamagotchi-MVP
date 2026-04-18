@@ -2,12 +2,11 @@ import {
   STORAGE_KEY,
   STATES,
   applyAction,
-  applyOfflineCatchUp,
-  applyPassiveTick,
+  applyElapsedTicks,
+  applyTick,
   createPet,
-  getCareBrief,
-  getMemoryCapsule,
-  getVitalVerdict,
+  averageStats,
+  getVitalStatus,
   normalizePet
 } from "./petRules.js";
 
@@ -21,12 +20,11 @@ const stateLabel = document.querySelector("#state-label");
 const petSprite = document.querySelector("#pet-sprite");
 const reaction = document.querySelector("#reaction");
 const resetButton = document.querySelector("#reset");
-const streak = document.querySelector("#streak");
-const nextAction = document.querySelector("#next-action");
-const careBrief = document.querySelector("#care-brief");
-const edgeStatus = document.querySelector("#edge-status");
-const memoryRitual = document.querySelector("#memory-ritual");
-const memorySummary = document.querySelector("#memory-summary");
+const sickTicks = document.querySelector("#sick-ticks");
+const recoveryTicks = document.querySelector("#recovery-ticks");
+const evolutionTicks = document.querySelector("#evolution-ticks");
+const totalActions = document.querySelector("#total-actions");
+const averageValue = document.querySelector("#average-value");
 
 const meters = {
   hunger: document.querySelector("#hunger-meter"),
@@ -50,12 +48,10 @@ let pet = loadPet();
 let timerId;
 
 if (pet) {
-  pet = applyOfflineCatchUp(pet);
+  pet = applyElapsedTicks(pet);
   savePet();
   showGame();
 }
-
-checkEdgeApi();
 
 form.addEventListener("submit", (event) => {
   event.preventDefault();
@@ -87,7 +83,7 @@ function showGame() {
   render();
   window.clearInterval(timerId);
   timerId = window.setInterval(() => {
-    pet = applyPassiveTick(pet);
+    pet = applyTick(pet);
     savePet();
     render();
   }, 10_000);
@@ -96,26 +92,22 @@ function showGame() {
 function render() {
   petTitle.textContent = pet.name;
   stateLabel.textContent = pet.state;
-  reaction.textContent = pet.reaction;
-  streak.textContent = Math.min(pet.healthyTicks, 3);
+  reaction.textContent = pet.message;
+  sickTicks.textContent = Math.min(pet.sickLowTicks, 3);
+  recoveryTicks.textContent = Math.min(pet.recoveryTicks, 2);
+  evolutionTicks.textContent = Math.min(pet.evolutionHighTicks, 5);
+  totalActions.textContent = pet.totalActions;
+  averageValue.textContent = averageStats(pet).toFixed(1);
   stage.dataset.state = pet.state;
 
   for (const vital of ["hunger", "happiness", "energy"]) {
-    const verdict = getVitalVerdict(pet[vital]);
+    const status = getVitalStatus(pet[vital]);
     meters[vital].value = pet[vital];
-    meters[vital].dataset.verdict = verdict.level;
+    meters[vital].dataset.verdict = status.level;
     values[vital].textContent = pet[vital];
-    verdicts[vital].textContent = verdict.label;
-    verdicts[vital].dataset.verdict = verdict.level;
+    verdicts[vital].textContent = status.label;
+    verdicts[vital].dataset.verdict = status.level;
   }
-
-  const brief = getCareBrief(pet);
-  nextAction.textContent = brief.action;
-  careBrief.textContent = brief.message;
-
-  const memory = getMemoryCapsule(pet);
-  memoryRitual.textContent = memory.ritual;
-  memorySummary.textContent = memory.summary;
 
   const sprite = {
     [STATES.NORMAL]: "assets/pet-normal.svg",
@@ -138,17 +130,4 @@ function loadPet() {
 
 function savePet() {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(pet));
-}
-
-async function checkEdgeApi() {
-  if (!edgeStatus) {
-    return;
-  }
-
-  try {
-    const response = await fetch("/api/health", { headers: { accept: "application/json" } });
-    edgeStatus.textContent = response.ok ? "Cloudflare edge API online" : "Local static mode";
-  } catch {
-    edgeStatus.textContent = "Local static mode";
-  }
 }

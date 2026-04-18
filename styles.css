@@ -293,7 +293,7 @@ input::placeholder {
   font-size: 0.68rem;
 }
 
-[data-verdict="compliant"] {
+[data-verdict="healthy"] {
   color: var(--compliant-green);
 }
 
@@ -318,7 +318,7 @@ progress::-webkit-progress-bar {
   background: var(--slate-navy);
 }
 
-progress[data-verdict="compliant"]::-webkit-progress-value {
+progress[data-verdict="healthy"]::-webkit-progress-value {
   background: var(--compliant-green);
 }
 
@@ -330,7 +330,7 @@ progress[data-verdict="critical"]::-webkit-progress-value {
   background: var(--critical-red);
 }
 
-progress[data-verdict="compliant"]::-moz-progress-bar {
+progress[data-verdict="healthy"]::-moz-progress-bar {
   background: var(--compliant-green);
 }
 

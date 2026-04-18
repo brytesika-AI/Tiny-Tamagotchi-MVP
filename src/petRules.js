@@ -1,4 +1,4 @@
-export const STORAGE_KEY = "tiny-tamagotchi-state-v1";
+export const STORAGE_KEY = "tiny-tamagotchi-state-v2";
 
 export const STATES = {
   NORMAL: "Normal",
@@ -6,67 +6,79 @@ export const STATES = {
   EVOLVED: "Evolved"
 };
 
+export const ACTIONS = {
+  FEED: "feed",
+  PLAY: "play",
+  REST: "rest"
+};
+
 export const RULES = {
   tickMs: 10_000,
   maxCatchUpTicks: 12,
-  sickThreshold: 20,
-  recoveryThreshold: 45,
-  evolutionThreshold: 80,
-  evolutionTicks: 3,
+  minStat: 0,
+  maxStat: 100,
+  sickThresholdExclusive: 20,
+  sickRequiredTicks: 3,
+  recoveryThresholdExclusive: 40,
+  recoveryRequiredTicks: 2,
+  evolutionAverageThreshold: 70,
+  evolutionRequiredTicks: 5,
+  evolutionRequiredActions: 8,
   initial: {
-    hunger: 76,
-    happiness: 74,
-    energy: 78
+    hunger: 80,
+    happiness: 80,
+    energy: 80
   },
   decay: {
-    hunger: -4,
-    happiness: -3,
+    hunger: -8,
+    happiness: -6,
     energy: -5
   },
   actions: {
     feed: {
-      hunger: 18,
-      happiness: 4,
-      energy: -4
+      hunger: 25,
+      happiness: 2,
+      energy: 0
     },
     play: {
-      hunger: -6,
-      happiness: 16,
+      hunger: -5,
+      happiness: 20,
       energy: -10
     },
     rest: {
-      hunger: -3,
-      happiness: -4,
-      energy: 22
+      hunger: 0,
+      happiness: -2,
+      energy: 30
     }
   }
 };
 
-const DEFAULT_REACTION = "Mochi wiggles hello.";
+const DEFAULT_NAME = "Mochi";
 
-export function clampVital(value) {
-  return Math.max(0, Math.min(100, Math.round(value)));
+export function clampStat(value) {
+  return Math.max(RULES.minStat, Math.min(RULES.maxStat, Math.round(value)));
 }
 
 export function createPet(name = "", now = Date.now()) {
-  const trimmedName = name.trim() || "Mochi";
+  const petName = normalizeName(name);
   return {
-    name: trimmedName,
+    name: petName,
     hunger: RULES.initial.hunger,
     happiness: RULES.initial.happiness,
     energy: RULES.initial.energy,
     state: STATES.NORMAL,
-    healthyTicks: 0,
+    sickLowTicks: 0,
+    recoveryTicks: 0,
+    evolutionHighTicks: 0,
     evolved: false,
+    totalActions: 0,
     lastUpdated: now,
-    reaction: trimmedName.toLowerCase() === "codex"
-      ? "Codex reads the spec, nods solemnly, and squeaks ready."
-      : DEFAULT_REACTION.replace("Mochi", trimmedName),
     actionCounts: {
       feed: 0,
       play: 0,
       rest: 0
-    }
+    },
+    message: initialMessage(petName)
   };
 }
 
@@ -75,25 +87,31 @@ export function normalizePet(raw, now = Date.now()) {
     return createPet("", now);
   }
 
-  const pet = {
-    ...createPet(String(raw.name || ""), now),
-    ...raw,
-    name: String(raw.name || "Mochi").trim() || "Mochi",
-    hunger: clampVital(Number(raw.hunger ?? RULES.initial.hunger)),
-    happiness: clampVital(Number(raw.happiness ?? RULES.initial.happiness)),
-    energy: clampVital(Number(raw.energy ?? RULES.initial.energy)),
-    healthyTicks: Math.max(0, Math.round(Number(raw.healthyTicks ?? 0))),
-    evolved: Boolean(raw.evolved),
-    lastUpdated: Number(raw.lastUpdated || now),
-    reaction: String(raw.reaction || DEFAULT_REACTION),
-    actionCounts: {
-      feed: Math.max(0, Number(raw.actionCounts?.feed || 0)),
-      play: Math.max(0, Number(raw.actionCounts?.play || 0)),
-      rest: Math.max(0, Number(raw.actionCounts?.rest || 0))
-    }
+  const base = createPet(String(raw.name || DEFAULT_NAME), now);
+  const state = Object.values(STATES).includes(raw.state) ? raw.state : STATES.NORMAL;
+  const actionCounts = {
+    feed: nonNegativeInteger(raw.actionCounts?.feed),
+    play: nonNegativeInteger(raw.actionCounts?.play),
+    rest: nonNegativeInteger(raw.actionCounts?.rest)
   };
+  const derivedTotal = actionCounts.feed + actionCounts.play + actionCounts.rest;
 
-  return recalculateState(pet, { passiveTick: false });
+  return {
+    ...base,
+    name: normalizeName(raw.name),
+    hunger: clampStat(Number(raw.hunger ?? RULES.initial.hunger)),
+    happiness: clampStat(Number(raw.happiness ?? RULES.initial.happiness)),
+    energy: clampStat(Number(raw.energy ?? RULES.initial.energy)),
+    state,
+    sickLowTicks: nonNegativeInteger(raw.sickLowTicks),
+    recoveryTicks: nonNegativeInteger(raw.recoveryTicks),
+    evolutionHighTicks: nonNegativeInteger(raw.evolutionHighTicks),
+    evolved: Boolean(raw.evolved),
+    totalActions: nonNegativeInteger(raw.totalActions ?? derivedTotal),
+    lastUpdated: Number(raw.lastUpdated || now),
+    actionCounts,
+    message: String(raw.message || base.message)
+  };
 }
 
 export function applyAction(pet, action, now = Date.now()) {
@@ -104,9 +122,10 @@ export function applyAction(pet, action, now = Date.now()) {
 
   const next = {
     ...pet,
-    hunger: clampVital(pet.hunger + delta.hunger),
-    happiness: clampVital(pet.happiness + delta.happiness),
-    energy: clampVital(pet.energy + delta.energy),
+    hunger: clampStat(pet.hunger + delta.hunger),
+    happiness: clampStat(pet.happiness + delta.happiness),
+    energy: clampStat(pet.energy + delta.energy),
+    totalActions: pet.totalActions + 1,
     lastUpdated: now,
     actionCounts: {
       ...pet.actionCounts,
@@ -114,48 +133,31 @@ export function applyAction(pet, action, now = Date.now()) {
     }
   };
 
-  const recalculated = recalculateState(next, { passiveTick: false });
   return {
-    ...recalculated,
-    reaction: reactionFor(recalculated, action)
+    ...next,
+    message: messageFor(next, action)
   };
 }
 
-export function applyPassiveTick(pet, now = Date.now()) {
-  const next = {
+export function applyTick(pet, now = Date.now()) {
+  const decayed = {
     ...pet,
-    hunger: clampVital(pet.hunger + RULES.decay.hunger),
-    happiness: clampVital(pet.happiness + RULES.decay.happiness),
-    energy: clampVital(pet.energy + RULES.decay.energy),
+    hunger: clampStat(pet.hunger + RULES.decay.hunger),
+    happiness: clampStat(pet.happiness + RULES.decay.happiness),
+    energy: clampStat(pet.energy + RULES.decay.energy),
     lastUpdated: now
   };
 
-  const recalculated = recalculateState(next, { passiveTick: true });
-  if (recalculated.state === STATES.SICK) {
-    return {
-      ...recalculated,
-      reaction: `${recalculated.name} feels wobbly and needs care.`
-    };
-  }
-  if (recalculated.evolved && !pet.evolved) {
-    return {
-      ...recalculated,
-      reaction: `${recalculated.name} sparkles into a tiny grown-up legend.`
-    };
-  }
-  return recalculated;
+  return applyTickStateRules(decayed);
 }
 
-export function applyOfflineCatchUp(pet, now = Date.now()) {
+export function applyElapsedTicks(pet, now = Date.now()) {
   const elapsed = Math.max(0, now - pet.lastUpdated);
-  const ticks = Math.min(
-    RULES.maxCatchUpTicks,
-    Math.floor(elapsed / RULES.tickMs)
-  );
-
+  const ticks = Math.min(RULES.maxCatchUpTicks, Math.floor(elapsed / RULES.tickMs));
   let next = { ...pet };
+
   for (let index = 0; index < ticks; index += 1) {
-    next = applyPassiveTick(next, pet.lastUpdated + RULES.tickMs * (index + 1));
+    next = applyTick(next, pet.lastUpdated + RULES.tickMs * (index + 1));
   }
 
   return {
@@ -164,175 +166,113 @@ export function applyOfflineCatchUp(pet, now = Date.now()) {
   };
 }
 
-export function getVitalVerdict(value) {
-  if (value <= RULES.sickThreshold) {
-    return { level: "critical", label: "FAILED" };
-  }
-  if (value < RULES.recoveryThreshold) {
-    return { level: "warning", label: "PARTIAL" };
-  }
-  return { level: "compliant", label: "PASSED" };
+export function averageStats(pet) {
+  return Math.round(((pet.hunger + pet.happiness + pet.energy) / 3) * 100) / 100;
 }
 
-export function getCareBrief(pet) {
-  const vitals = [
-    { key: "hunger", label: "Hunger", value: pet.hunger, action: "Feed" },
-    { key: "happiness", label: "Happiness", value: pet.happiness, action: "Play" },
-    { key: "energy", label: "Energy", value: pet.energy, action: "Rest" }
-  ].sort((a, b) => a.value - b.value);
-
-  const weakest = vitals[0];
-  if (pet.state === STATES.SICK) {
-    return {
-      action: weakest.action,
-      message: `${weakest.label} is the weakest vital. Use ${weakest.action} until every vital is at least ${RULES.recoveryThreshold}.`
-    };
+export function getVitalStatus(value) {
+  if (value < RULES.sickThresholdExclusive) {
+    return { level: "critical", label: "LOW" };
   }
-
-  if (vitals.every((vital) => vital.value >= RULES.evolutionThreshold)) {
-    return {
-      action: "Monitor",
-      message: `All vitals are evolution-ready. Hold this rhythm for ${RULES.evolutionTicks} passive ticks.`
-    };
+  if (value <= RULES.recoveryThresholdExclusive) {
+    return { level: "warning", label: "WATCH" };
   }
-
-  if (weakest.value < RULES.recoveryThreshold) {
-    return {
-      action: weakest.action,
-      message: `${weakest.label} needs attention before the pet slips into Sick state.`
-    };
-  }
-
-  return {
-    action: weakest.action,
-    message: `${weakest.label} is lowest. A timely ${weakest.action} keeps the care streak alive.`
-  };
+  return { level: "healthy", label: "OK" };
 }
 
-export function getMemoryCapsule(pet) {
-  const counts = {
-    feed: Number(pet.actionCounts?.feed || 0),
-    play: Number(pet.actionCounts?.play || 0),
-    rest: Number(pet.actionCounts?.rest || 0)
-  };
-  const totalCare = counts.feed + counts.play + counts.rest;
-  const sorted = Object.entries(counts).sort((a, b) => b[1] - a[1]);
-  const [topAction, topCount] = sorted[0];
+function applyTickStateRules(pet) {
+  const anyBelowSick = [pet.hunger, pet.happiness, pet.energy].some(
+    (value) => value < RULES.sickThresholdExclusive
+  );
+  const allAboveRecovery = [pet.hunger, pet.happiness, pet.energy].every(
+    (value) => value > RULES.recoveryThresholdExclusive
+  );
+  const averageHighEnough = averageStats(pet) >= RULES.evolutionAverageThreshold;
 
-  if (totalCare === 0) {
-    return {
-      ritual: "First greeting",
-      summary: `${pet.name} has no care memory yet. The first action will become part of the ritual.`,
-      counts,
-      totalCare
-    };
-  }
+  let next = { ...pet };
 
-  const rituals = {
-    feed: "Calabash snack keeper",
-    play: "Courtyard rhythm runner",
-    rest: "Baobab dream listener"
-  };
+  if (next.state === STATES.SICK) {
+    next.sickLowTicks = anyBelowSick ? next.sickLowTicks + 1 : 0;
+    next.recoveryTicks = allAboveRecovery ? next.recoveryTicks + 1 : 0;
+    next.evolutionHighTicks = 0;
 
-  const actionLabel = {
-    feed: "feeding",
-    play: "play",
-    rest: "rest"
-  };
-
-  const ritual = topCount >= 3 ? rituals[topAction] : "Balanced care apprentice";
-
-  return {
-    ritual,
-    summary: `${pet.name} remembers ${totalCare} care moments. ${actionLabel[topAction]} is the strongest pattern.`,
-    counts,
-    totalCare
-  };
-}
-
-export function getStructuredCareCard(pet) {
-  return {
-    schema: "tiny-tamagotchi-care-card-v1",
-    constraints: {
-      singlePet: true,
-      allowedActions: ["Feed", "Play", "Rest"],
-      noDeath: true,
-      noInventory: true
-    },
-    care: getCareBrief(pet),
-    memory: getMemoryCapsule(pet),
-    verdicts: {
-      hunger: getVitalVerdict(pet.hunger),
-      happiness: getVitalVerdict(pet.happiness),
-      energy: getVitalVerdict(pet.energy)
+    if (next.recoveryTicks >= RULES.recoveryRequiredTicks) {
+      next.state = STATES.NORMAL;
+      next.sickLowTicks = 0;
+      next.recoveryTicks = 0;
+      next.message = `${next.name} has recovered and is steady again.`;
+    } else {
+      next.message = `${next.name} is sick and needs all stats above ${RULES.recoveryThresholdExclusive}.`;
     }
-  };
-}
-
-export function recalculateState(pet, { passiveTick }) {
-  const isSick = [pet.hunger, pet.happiness, pet.energy].some(
-    (vital) => vital <= RULES.sickThreshold
-  );
-
-  if (isSick) {
-    return {
-      ...pet,
-      state: STATES.SICK,
-      healthyTicks: 0
-    };
+    return next;
   }
 
-  const recoveredState = pet.evolved ? STATES.EVOLVED : STATES.NORMAL;
-  const isHighCare = [pet.hunger, pet.happiness, pet.energy].every(
-    (vital) => vital >= RULES.evolutionThreshold
-  );
+  next.sickLowTicks = anyBelowSick ? next.sickLowTicks + 1 : 0;
+  next.recoveryTicks = 0;
 
-  const healthyTicks = passiveTick
-    ? (isHighCare ? pet.healthyTicks + 1 : 0)
-    : pet.healthyTicks;
-
-  if (pet.evolved || healthyTicks >= RULES.evolutionTicks) {
-    return {
-      ...pet,
-      evolved: true,
-      state: STATES.EVOLVED,
-      healthyTicks
-    };
+  if (next.sickLowTicks >= RULES.sickRequiredTicks) {
+    next.state = STATES.SICK;
+    next.evolutionHighTicks = 0;
+    next.message = `${next.name} is sick after repeated neglect.`;
+    return next;
   }
 
-  const isRecovered = [pet.hunger, pet.happiness, pet.energy].every(
-    (vital) => vital >= RULES.recoveryThreshold
-  );
+  if (!next.evolved && averageHighEnough && next.totalActions >= RULES.evolutionRequiredActions) {
+    next.evolutionHighTicks += 1;
+  } else if (!next.evolved) {
+    next.evolutionHighTicks = 0;
+  }
 
-  return {
-    ...pet,
-    state: isRecovered ? recoveredState : pet.state === STATES.SICK ? STATES.SICK : STATES.NORMAL,
-    healthyTicks
-  };
+  if (!next.evolved && next.evolutionHighTicks >= RULES.evolutionRequiredTicks) {
+    next.evolved = true;
+    next.state = STATES.EVOLVED;
+    next.message = `${next.name} evolves for the first time and glows with pride.`;
+    return next;
+  }
+
+  if (!next.evolved) {
+    next.state = STATES.NORMAL;
+  }
+
+  if (!next.message) {
+    next.message = `${next.name} watches the room carefully.`;
+  }
+
+  return next;
 }
 
-function reactionFor(pet, action) {
-  const count = pet.actionCounts[action] || 0;
-
+function messageFor(pet, action) {
   if (pet.state === STATES.SICK) {
-    return `${pet.name} accepts the care, but still needs gentler attention.`;
+    return `${pet.name} accepts care, but recovery needs two healthy ticks.`;
   }
 
-  if (action === "feed" && count >= 3) {
-    return `${pet.name} reveals a secret crumb stash behind the moon pillow.`;
+  if (pet.happiness >= 95) {
+    return `${pet.name} does a tiny victory dance.`;
   }
-  if (action === "play" && count >= 3) {
-    return `${pet.name} launches a cardboard rocket across the room.`;
+  if (pet.energy <= 20) {
+    return `${pet.name} yawns and asks for a quiet rest.`;
   }
-  if (action === "rest" && count >= 3) {
-    return `${pet.name} dreams of tiny clouds wearing little boots.`;
+  if (action === ACTIONS.FEED && pet.actionCounts.feed >= 3) {
+    return `${pet.name} reveals a secret snack stash.`;
   }
 
-  const reactions = {
-    feed: `${pet.name} crunches snacks and saves one crumb for later.`,
-    play: `${pet.name} bounces twice, then invents a toy parade.`,
-    rest: `${pet.name} curls under a blanket and hums softly.`
+  const messages = {
+    feed: `${pet.name} crunches happily.`,
+    play: `${pet.name} bounces with bright eyes.`,
+    rest: `${pet.name} tucks into a warm nap.`
   };
+  return messages[action];
+}
 
-  return reactions[action];
+function normalizeName(name) {
+  const text = String(name || "").trim();
+  return text || DEFAULT_NAME;
+}
+
+function initialMessage(name) {
+  return `${name} is ready for care.`;
+}
+
+function nonNegativeInteger(value) {
+  return Math.max(0, Math.round(Number(value || 0)));
 }

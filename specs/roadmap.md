@@ -1,44 +1,85 @@
 # Roadmap
 
-## MVP Release
+## Milestone 1: Constitution Documents
 
-The MVP is the challenge submission build. It includes the full core pet loop and the required documentation.
+Define project mission, audience, constraints, non-goals, success criteria, stack, persistence, testing approach, and intentional tradeoffs.
 
-### Goals
+Files:
 
-- Write implementation-ready specifications before coding.
-- Build a dependency-free web app that can run locally from static files.
-- Store progress locally so the pet survives refreshes.
-- Provide automated and manual validation.
+- `specs/mission.md`
+- `specs/roadmap.md`
+- `specs/tech-stack.md`
 
-### Included Features
+## Milestone 2: Core Loop
 
-- Pet naming.
-- Passive vital decay.
-- Feed, Play, and Rest actions.
-- Normal, Sick, and Evolved states.
-- Sick recovery.
-- One evolution.
-- Personality reactions and Easter eggs.
-- Local persistence.
+Build the smallest playable loop:
 
-## Deferred Work
+- Name one pet.
+- Display Hunger, Happiness, and Energy.
+- Provide Feed, Play, and Rest.
+- Apply one passive tick every 10 seconds.
+- Clamp all stats to 0 through 100.
 
-The following are intentionally out of scope for the challenge:
+Feature docs:
+
+- `core-loop/feature-plan.md`
+- `core-loop/requirements.md`
+- `core-loop/validation.md`
+
+## Milestone 3: Pet State System
+
+Add Normal and Sick behavior:
+
+- Track 3 consecutive low-stat ticks.
+- Enter Sick when any stat is below 20 for 3 consecutive ticks.
+- Continue normal tick decay while Sick.
+- Recover to Normal when all stats are above 40 for 2 consecutive ticks.
+
+Feature docs:
+
+- `pet-state-system/feature-plan.md`
+- `pet-state-system/requirements.md`
+- `pet-state-system/validation.md`
+
+## Milestone 4: Evolution System
+
+Add one-time evolution:
+
+- Require pet not Sick.
+- Require average stats at least 70 for 5 consecutive ticks.
+- Require at least 8 total care actions.
+- Allow evolution only once.
+
+Feature docs:
+
+- `evolution-system/feature-plan.md`
+- `evolution-system/requirements.md`
+- `evolution-system/validation.md`
+
+## Milestone 5: Personality and Easter Eggs
+
+Add small deterministic personality reactions without expanding scope:
+
+- High happiness reaction.
+- Low energy reaction.
+- Repeated Feed reaction.
+- First evolution reaction.
+
+Feature docs:
+
+- `personality-easter-eggs/feature-plan.md`
+- `personality-easter-eggs/requirements.md`
+- `personality-easter-eggs/validation.md`
+
+## Deferred Intentionally
 
 - Accounts and cloud sync.
+- Backend persistence.
 - Multiple pets.
-- More than one evolution.
-- Inventory or currency systems.
+- Additional stats.
+- More actions.
+- Inventory or currency.
 - Mini-games.
-- Push notifications.
+- Notifications.
 - Permanent death.
-
-## Milestones
-
-1. Specification baseline: mission, roadmap, tech stack, feature plan, requirements, and validation documents.
-2. Rules module: deterministic pet state functions and thresholds.
-3. Browser app: single-page UI, visual state feedback, actions, local persistence.
-4. Validation suite: automated unit tests and manual acceptance checklist.
-5. Submission polish: README and repository organization.
-
+- Branching evolutions.

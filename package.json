@@ -4,8 +4,6 @@
   "description": "Spec-driven Tiny Tamagotchi MVP challenge submission",
   "type": "module",
   "scripts": {
-    "build:cloudflare": "node scripts/prepare-cloudflare.mjs",
-    "deploy:cloudflare": "npm run build:cloudflare && wrangler pages deploy .deploy --project-name=tiny-tamagotchi-mvp --branch=main",
     "start": "node server.js",
     "test": "node --test"
   },
