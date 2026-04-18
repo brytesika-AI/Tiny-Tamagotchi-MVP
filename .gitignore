@@ -1,4 +1,4 @@
 .deploy/
+.course_tmp/
 node_modules/
 .wrangler/
-

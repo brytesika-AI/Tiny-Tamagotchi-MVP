@@ -1,5 +1,17 @@
 # Validation: Core Pet Loop
 
+## Definition of Done
+
+All of the following must be true before submission:
+
+- Constitution documents exist: `specs/mission.md`, `specs/roadmap.md`, and `specs/tech-stack.md`.
+- Feature documents exist: `specs/core-pet-loop/feature-plan.md`, `requirements.md`, and `validation.md`.
+- Requirements include Scope, Out of Scope, Decisions, Context, constants, actions, states, care intelligence, Hermes-inspired memory, Cloudflare API rules, and brand rules.
+- Automated tests pass.
+- Manual browser flow confirms naming, actions, passive tick, sick recovery, evolution, persistence, branding, and Cloudflare edge status.
+- Cloudflare Pages deployment is live.
+- Governance colors are used only for vital verdicts.
+
 ## Automated Validation
 
 Run:
@@ -59,3 +71,17 @@ The automated suite must verify:
 ## Validation Traceability
 
 Every automated test maps to a rule in `requirements.md`. Manual tests cover browser rendering, persistence, and the user-visible care loop described in `feature-plan.md`.
+
+## Traceability Checklist
+
+| Spec Item | Implementation | Validation |
+| --- | --- | --- |
+| Initial vitals | `createPet` in `src/petRules.js` | `creates a default pet` test |
+| Action deltas | `applyAction` in `src/petRules.js` | `applies Feed, Play, and Rest deltas` test |
+| Passive decay | `applyPassiveTick` in `src/petRules.js` | `passive tick decays` test |
+| Sick recovery | `recalculateState` in `src/petRules.js` | `Sick pet recovers` test |
+| Evolution | `recalculateState` in `src/petRules.js` | `pet evolves after three high-care passive ticks` test |
+| Brand palette | `styles.css` and SVG assets | Manual brand checks |
+| Care intelligence | `getCareBrief` in `src/petRules.js` | `care brief recommends` test |
+| Hermes memory | `getMemoryCapsule` in `src/petRules.js` | `memory capsule summarizes` test |
+| Structured Cloudflare card | `functions/api/care-brief.js` | `structured care card exposes` test and manual API check |

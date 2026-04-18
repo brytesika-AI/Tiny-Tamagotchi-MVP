@@ -27,6 +27,10 @@ The app borrows safe ideas from the Ollama Hermes Agent docs: structured care ca
 - The browser shows a local Hermes memory ritual based on Feed, Play, and Rest history.
 - `POST /api/care-brief` returns a structured `tiny-tamagotchi-care-card-v1` response.
 
+## Course-Inspired Spec Workflow
+
+The specs follow the course repo pattern: constitution first, then a feature package with plan, requirements, validation, Definition of Done, and traceability.
+
 ## Run Locally
 
 Start the local static server:

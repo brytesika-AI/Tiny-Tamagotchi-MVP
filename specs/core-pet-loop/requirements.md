@@ -1,5 +1,47 @@
 # Requirements: Core Pet Loop
 
+## Scope
+
+This feature includes the complete MVP care loop for one named pet, one browser user, one evolution, one recovery path, three vitals, three care actions, three visible states, local persistence, dark-only brand presentation, Cloudflare edge APIs, care intelligence, and Hermes-inspired memory.
+
+## Out of Scope
+
+- Authentication.
+- Multiple users.
+- Multiple pets.
+- Inventories.
+- Currencies.
+- Mini-games.
+- Social features.
+- Push, email, SMS, or external notifications.
+- Admin features.
+- Multiple evolution branches.
+- Permanent death.
+- Autonomous background agents.
+- Messaging gateways.
+
+## Decisions
+
+### Use a deterministic rule module
+
+All gameplay thresholds, action deltas, state transitions, care recommendations, verdicts, and memory rituals must live in `src/petRules.js`. This keeps the implementation agent-replaceable: another coding agent can read the requirements and test the same pure functions without reverse-engineering UI code.
+
+### Use local persistence only
+
+The single allowed user is represented by browser `localStorage`. Cloudflare APIs provide structured guidance, not account storage.
+
+### Use Cloudflare APIs without expanding scope
+
+Cloudflare Pages Functions are used for `health` and structured care-card endpoints. They do not add authentication, multi-user storage, messaging, or notifications.
+
+### Use Hermes as inspiration, not as runtime dependency
+
+Hermes-inspired memory and structured outputs are implemented with local deterministic logic. The app does not require Ollama, Hermes, or an LLM to play.
+
+## Context
+
+This feature is judged primarily on spec quality. Requirements must be explicit enough that a coding agent can implement or reimplement the app without asking for hidden thresholds, state rules, or validation criteria.
+
 ## Constants
 
 - Vitals are integers from 0 to 100.
@@ -153,3 +195,10 @@ Memory rules:
 - Labels and captions must use Steel Mist `#8A9BB0`.
 - Governance status colors must be used only for vital verdicts.
 - The UI and pet art must include African-inspired geometric patterning.
+
+## Stakeholder Notes
+
+- Challenge evaluators need clear traceability from mission to requirements to validation.
+- The player needs immediate feedback, not a complex dashboard.
+- The app owner needs the brand to stay dark-only and distinctively African-inspired.
+- Future coding agents need deterministic rules and tests before touching presentation.

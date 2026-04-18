@@ -4,6 +4,42 @@
 
 The core pet loop makes the pet feel alive through passive decay, simple care actions, visible states, and personality reactions.
 
+## Course-Inspired Planning Model
+
+This plan follows the DeepLearning.AI course pattern of grouping work into independently implementable task groups. Each group can be handed to a coding agent with the constitution documents already in place.
+
+## Task Groups
+
+### Group 1: Constitution Alignment
+
+1. Confirm `specs/mission.md` defines audience, product mission, constraints, and success criteria.
+2. Confirm `specs/tech-stack.md` defines runtime, architecture, persistence, accessibility, Cloudflare deployment, and brand rules.
+3. Confirm `specs/roadmap.md` keeps the MVP scope focused and lists deferred work.
+
+### Group 2: Deterministic Pet Rules
+
+4. Implement all stat thresholds, action deltas, state transitions, recovery, evolution, verdicts, and memory rules in `src/petRules.js`.
+5. Keep UI code from duplicating thresholds.
+6. Export pure functions for tests and Cloudflare Pages Functions.
+
+### Group 3: Browser Experience
+
+7. Implement naming, vitals, action buttons, state visuals, reactions, care intelligence, Hermes memory, and reset flow in `index.html`, `styles.css`, and `src/app.js`.
+8. Persist one pet locally with `localStorage`.
+9. Keep the experience single-page and single-user.
+
+### Group 4: Cloudflare Edge API
+
+10. Implement `GET /api/health`.
+11. Implement `POST /api/care-brief`.
+12. Return structured JSON that mirrors the same care logic used in the browser.
+
+### Group 5: Validation
+
+13. Implement automated tests for pet rules, verdicts, care guidance, Hermes memory, and structured care cards.
+14. Document manual browser, branding, persistence, and Cloudflare checks.
+15. Deploy only after tests pass.
+
 ## User Flow
 
 1. The user opens the page.
