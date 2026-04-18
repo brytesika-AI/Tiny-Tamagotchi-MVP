@@ -24,22 +24,22 @@ specs/
   mission.md
   roadmap.md
   tech-stack.md
-core-loop/
-  feature-plan.md
-  requirements.md
-  validation.md
-pet-state-system/
-  feature-plan.md
-  requirements.md
-  validation.md
-evolution-system/
-  feature-plan.md
-  requirements.md
-  validation.md
-personality-easter-eggs/
-  feature-plan.md
-  requirements.md
-  validation.md
+  core-loop/
+    feature-plan.md
+    requirements.md
+    validation.md
+  pet-state-system/
+    feature-plan.md
+    requirements.md
+    validation.md
+  evolution-system/
+    feature-plan.md
+    requirements.md
+    validation.md
+  personality-easter-eggs/
+    feature-plan.md
+    requirements.md
+    validation.md
 tests/
   README.md
   petRules.test.js

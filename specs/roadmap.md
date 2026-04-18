@@ -22,9 +22,9 @@ Build the smallest playable loop:
 
 Feature docs:
 
-- `core-loop/feature-plan.md`
-- `core-loop/requirements.md`
-- `core-loop/validation.md`
+- `specs/core-loop/feature-plan.md`
+- `specs/core-loop/requirements.md`
+- `specs/core-loop/validation.md`
 
 ## Milestone 3: Pet State System
 
@@ -37,9 +37,9 @@ Add Normal and Sick behavior:
 
 Feature docs:
 
-- `pet-state-system/feature-plan.md`
-- `pet-state-system/requirements.md`
-- `pet-state-system/validation.md`
+- `specs/pet-state-system/feature-plan.md`
+- `specs/pet-state-system/requirements.md`
+- `specs/pet-state-system/validation.md`
 
 ## Milestone 4: Evolution System
 
@@ -52,9 +52,9 @@ Add one-time evolution:
 
 Feature docs:
 
-- `evolution-system/feature-plan.md`
-- `evolution-system/requirements.md`
-- `evolution-system/validation.md`
+- `specs/evolution-system/feature-plan.md`
+- `specs/evolution-system/requirements.md`
+- `specs/evolution-system/validation.md`
 
 ## Milestone 5: Personality and Easter Eggs
 
@@ -67,9 +67,9 @@ Add small deterministic personality reactions without expanding scope:
 
 Feature docs:
 
-- `personality-easter-eggs/feature-plan.md`
-- `personality-easter-eggs/requirements.md`
-- `personality-easter-eggs/validation.md`
+- `specs/personality-easter-eggs/feature-plan.md`
+- `specs/personality-easter-eggs/requirements.md`
+- `specs/personality-easter-eggs/validation.md`
 
 ## Deferred Intentionally
 
